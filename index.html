@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JD Fit Gap — Jack Gee</title>
+  <script src="https://js.puter.com/v2/"></script>
+  <style>
+    :root {
+      --bg: #f4f2ec;
+      --paper: #fffcf7;
+      --ink: #1c1c1a;
+      --muted: #5c5a55;
+      --line: #e4e0d6;
+      --accent: #2f6fed;
+      --good: #1f7a4c;
+      --warn: #9a6700;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+    .wrap { max-width: 52rem; margin: 0 auto; padding: 2rem 1.2rem 4rem; }
+    h1 { font-size: 1.75rem; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    .sub { color: var(--muted); margin: 0 0 1.5rem; }
+    .disclaimer {
+      background: #fff8e6;
+      border: 1px solid #f0e0a8;
+      color: #6b5420;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+    .grid { display: grid; gap: 1rem; }
+    @media (min-width: 800px) {
+      .grid.two { grid-template-columns: 1fr 1fr; }
+    }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+    textarea, input[type="password"], input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.75rem;
+      background: var(--paper);
+      color: var(--ink);
+      font: inherit;
+      resize: vertical;
+    }
+    textarea { min-height: 12rem; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0; }
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 0.65rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+    }
+    button.secondary { background: #eceae3; color: var(--ink); }
+    button:disabled { opacity: 0.55; cursor: wait; }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      margin-top: 1rem;
+    }
+    .score {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .score span { font-size: 1rem; color: var(--muted); font-weight: 500; }
+    ul { margin: 0.4rem 0 0; padding-left: 1.2rem; color: var(--muted); }
+    li { margin-bottom: 0.35rem; }
+    .bullets li { color: var(--ink); }
+    .err { color: #a32020; white-space: pre-wrap; }
+    .status { color: var(--muted); font-size: 0.9rem; min-height: 1.2em; }
+    footer { margin-top: 2rem; color: var(--muted); font-size: 0.85rem; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>JD Fit Gap</h1>
+    <p class="sub">Paste a resume and job description. Get a fit score, gap list, and 3 rewritten bullets. Tool assist — not a hiring decision.</p>
+    <div class="disclaimer">Live AI via Puter (sign-in popup may appear; usage is on the signed-in account’s free allowance). Optional OpenAI key field below for a direct API path when a same-origin proxy is available.</div>
+
+    <div class="grid two">
+      <div>
+        <label for="resume">Resume</label>
+        <textarea id="resume" placeholder="Paste resume text…"></textarea>
+      </div>
+      <div>
+        <label for="jd">Job description</label>
+        <textarea id="jd" placeholder="Paste JD text…"></textarea>
+      </div>
+    </div>
+
+    <div style="margin-top:1rem">
+      <label for="key">OpenAI API key (optional, stays in this browser only)</label>
+      <input id="key" type="password" autocomplete="off" placeholder="sk-… (optional)" />
+    </div>
+
+    <div class="row">
+      <button type="button" id="sample">Load sample</button>
+      <button type="button" class="secondary" id="run" disabled>Analyze fit</button>
+    </div>
+    <p class="status" id="status"></p>
+
+    <section class="panel" id="out" hidden>
+      <div class="score" id="score">— <span>/ 100</span></div>
+      <h2 style="font-size:1rem;margin:1rem 0 0.3rem">Gaps</h2>
+      <ul id="gaps"></ul>
+      <h2 style="font-size:1rem;margin:1rem 0 0.3rem">Rewritten bullets</h2>
+      <ul class="bullets" id="bullets"></ul>
+    </section>
+    <p class="err" id="err"></p>
+
+    <footer>
+      Built by Jack Gee · <a href="https://j-1002.github.io/jack-gee-portfolio-hub/">Portfolio hub</a>
+    </footer>
+  </main>
+  <script>
+    const SAMPLE_RESUME = `Alex Rivera
+Business Analytics student · GPA 3.9
+Experience
+Outreach Specialist, Acquisition Partners (2025)
+- Researched acquisition targets and screened companies against an investment thesis
+- Ran outbound outreach to owners and summarized fit for internal review
+- Built simple financial and operational snapshots for deal evaluation
+Financial Analyst Intern, Equation Business Solutions (summers)
+- Tracked expenses and ops metrics; flagged process inefficiencies
+- Supported client-facing docs and reporting
+Skills: Excel, CRM tools, research, writing`;
+
+    const SAMPLE_JD = `Associate, Corporate Development
+We're hiring an associate to support sourcing and diligence for small acquisitions.
+Requirements:
+- Strong research and written communication
+- Comfort with financial basics and Excel
+- Experience talking to business owners or customers a plus
+- Interest in M&A / investments
+Nice to have: CRM experience, prior internship in finance or ops`;
+
+    const SAMPLE_RESULT = {
+      score: 78,
+      gaps: [
+        "No explicit M&A / diligence coursework or deal-close experience called out",
+        "Limited quantified outcomes (pipeline size, response rates, $ impact)",
+        "CRM depth is named as a skill but not shown in a bullet"
+      ],
+      bullets: [
+        "Sourced and screened acquisition targets with company-level research, producing concise investment-thesis memos for internal review.",
+        "Led outbound owner outreach and structured first conversations around partnership, investment, and succession — feeding a live deal pipeline.",
+        "Built preliminary financial and operational snapshots in Excel to support go/no-go evaluation on prospective businesses."
+      ]
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const resume = $("resume");
+    const jd = $("jd");
+    const key = $("key");
+    const status = $("status");
+    const err = $("err");
+    const out = $("out");
+    const runBtn = $("run");
+
+    function syncRun() {
+      runBtn.disabled = !(resume.value.trim() && jd.value.trim());
+    }
+    resume.addEventListener("input", syncRun);
+    jd.addEventListener("input", syncRun);
+
+    $("sample").onclick = () => {
+      resume.value = SAMPLE_RESUME;
+      jd.value = SAMPLE_JD;
+      syncRun();
+      status.textContent = "Sample loaded — click Analyze fit (live AI) or use the precomputed preview.";
+      render(SAMPLE_RESULT);
+    };
+
+    function render(data) {
+      out.hidden = false;
+      $("score").innerHTML = `${data.score} <span>/ 100</span>`;
+      $("gaps").innerHTML = (data.gaps || []).map((g) => `<li>${escapeHtml(g)}</li>`).join("");
+      $("bullets").innerHTML = (data.bullets || []).map((b) => `<li>${escapeHtml(b)}</li>`).join("");
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+    }
+
+    function parseModelJson(text) {
+      const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+      return JSON.parse(cleaned);
+    }
+
+    const SYSTEM = `You are a career-fit assistant. Given a resume and a job description, return ONLY valid JSON with keys:
+score (integer 0-100), gaps (array of 3-5 short strings), bullets (array of exactly 3 rewritten resume bullets tailored to the JD).
+Be specific and honest. Never promise a hire. No markdown outside JSON.`;
+
+    async function analyzeWithPuter(resumeText, jdText) {
+      const prompt = `${SYSTEM}\n\nRESUME:\n${resumeText}\n\nJOB DESCRIPTION:\n${jdText}`;
+      const resp = await puter.ai.chat(prompt, { model: "openai/gpt-4o-mini", normalize: true });
+      const content = typeof resp === "string" ? resp : (resp?.message?.content || resp?.toString?.() || "");
+      return parseModelJson(content);
+    }
+
+    async function analyzeWithOpenAI(resumeText, jdText, apiKey) {
+      const body = {
+        model: "gpt-4o-mini",
+        temperature: 0.3,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: `RESUME:\n${resumeText}\n\nJOB DESCRIPTION:\n${jdText}` }
+        ]
+      };
+      const r = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`
+        },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) {
+        const t = await r.text();
+        throw new Error(`OpenAI ${r.status}: ${t.slice(0, 300)}`);
+      }
+      const data = await r.json();
+      return parseModelJson(data.choices[0].message.content);
+    }
+
+    runBtn.onclick = async () => {
+      err.textContent = "";
+      status.textContent = "Analyzing…";
+      runBtn.disabled = true;
+      try {
+        let data;
+        const k = key.value.trim();
+        if (k) {
+          try {
+            data = await analyzeWithOpenAI(resume.value.trim(), jd.value.trim(), k);
+          } catch (e) {
+            // Browser CORS often blocks direct OpenAI calls; fall back to Puter.
+            status.textContent = "Direct OpenAI blocked in browser — using Puter live AI…";
+            data = await analyzeWithPuter(resume.value.trim(), jd.value.trim());
+          }
+        } else {
+          data = await analyzeWithPuter(resume.value.trim(), jd.value.trim());
+        }
+        if (typeof data.score !== "number" || !Array.isArray(data.gaps) || !Array.isArray(data.bullets)) {
+          throw new Error("Model returned unexpected shape");
+        }
+        render(data);
+        status.textContent = "Done.";
+      } catch (e) {
+        err.textContent = e.message || String(e);
+        status.textContent = "Failed.";
+      } finally {
+        syncRun();
+      }
+    };
+  </script>
+</body>
+</html>
