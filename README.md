@@ -1,21 +1,21 @@
-# JD Fit Gap
+# Apply Kit
 
-Paste a resume + job description → fit score, gaps, and three rewritten bullets.
+Career toolkit (portfolio product by Jack Gee):
 
-## Stack
-Next.js (App Router) + TypeScript + Tailwind. OpenAI via same-origin `/api/analyze`.
+- **Fit Gap** — resume + JD → score, gaps, rewritten bullets
+- **Resume Advisor** — strengths, weak spots, priority fixes, draft summary
+- **Cover Letter** — role-specific letter + rationale
+- **Interview Prep** — likely questions, STAR prompts, opening pitch
+
+Shared resume/JD context across tools. Same-origin OpenAI APIs. No API keys in the UI.
 
 ## Local
 ```bash
 cp .env.example .env.local
-# put OPENAI_API_KEY in .env.local
+# OPENAI_API_KEY=...
 npm install
 npm run dev
 ```
 
-## Deploy (Vercel, free)
-1. Import this repo in Vercel
-2. Set `OPENAI_API_KEY` in Project → Settings → Environment Variables
-3. Deploy
-
-Do not commit `.env.local`.
+## Deploy
+Vercel with `OPENAI_API_KEY` set in project env.

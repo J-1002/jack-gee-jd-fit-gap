@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { chatJson } from "@/lib/openai";
-import { FIT_SYSTEM } from "@/lib/prompts";
-import type { FitResult } from "@/lib/types";
+import { INTERVIEW_SYSTEM } from "@/lib/prompts";
+import type { InterviewResult } from "@/lib/types";
 import { parseJsonObject, requireText } from "@/lib/validate";
 
 export const runtime = "nodejs";
@@ -21,26 +21,22 @@ export async function POST(req: Request) {
 
   try {
     const content = await chatJson(
-      FIT_SYSTEM,
+      INTERVIEW_SYSTEM,
       `RESUME:\n${resume}\n\nJOB DESCRIPTION:\n${jd}`,
     );
-    const data = parseJsonObject<FitResult>(content);
+    const data = parseJsonObject<InterviewResult>(content);
     if (
-      typeof data.score !== "number" ||
-      !Array.isArray(data.gaps) ||
-      !Array.isArray(data.bullets) ||
-      data.bullets.length !== 3
+      !Array.isArray(data.likelyQuestions) ||
+      data.likelyQuestions.length < 3 ||
+      !Array.isArray(data.storiesToPrep) ||
+      typeof data.openingPitch !== "string"
     ) {
       return NextResponse.json({ error: "Unexpected model shape" }, { status: 502 });
     }
-    return NextResponse.json({
-      score: Math.max(0, Math.min(100, Math.round(data.score))),
-      gaps: data.gaps.map(String).slice(0, 6),
-      bullets: data.bullets.map(String),
-    } satisfies FitResult);
+    return NextResponse.json(data);
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Analyze failed" },
+      { error: e instanceof Error ? e.message : "Interview prep failed" },
       { status: 502 },
     );
   }

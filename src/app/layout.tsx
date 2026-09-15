@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AppShell } from "@/components/AppShell";
+import { ResumeProvider } from "@/lib/resume-context";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,20 +15,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JD Fit Gap — Jack Gee",
+  title: "Apply Kit — Jack Gee",
   description:
-    "Paste a resume and job description. Get a fit score, gaps, and three rewritten bullets. Tool assist — not a hiring decision.",
+    "Career toolkit: JD fit gap, resume advisor, cover letter helper, and interview prep. Shared resume context. Drafting assist only.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {children}
+        <ResumeProvider>
+          <AppShell>{children}</AppShell>
+        </ResumeProvider>
       </body>
     </html>
   );

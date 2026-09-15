@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f3f1eb;
-  --paper: #fffcf8;
+  --bg: #f2f0ea;
+  --paper: #fffcf7;
   --ink: #141413;
-  --muted: #5f5e5a;
-  --line: #e2ddd3;
-  --accent: #1f4fd8;
-  --accent-hover: #183db0;
+  --muted: #5c5b57;
+  --line: #e1ddd4;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
   --warn-bg: #fff7e8;
   --warn-ink: #6a5218;
   --err: #a11d1d;
@@ -30,7 +30,17 @@ body {
 }
 
 textarea:focus,
-button:focus-visible {
+input:focus,
+button:focus-visible,
+a:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--accent) 55%, white);
   outline-offset: 2px;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: 1rem;
+  padding: 1.15rem 1.25rem;
+  box-shadow: 0 1px 0 rgba(20, 20, 19, 0.03);
 }
