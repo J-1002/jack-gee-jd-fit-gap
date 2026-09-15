@@ -2,17 +2,19 @@
 
 Date: 2026-09-15
 
+## Live
+- URL: https://jd-fit-gap.vercel.app/
+- Repo: https://github.com/J-1002/jack-gee-jd-fit-gap
+- Host: Vercel (equation-us/jd-fit-gap) with server `OPENAI_API_KEY`
+
 ## Quality bar
-- Next.js + TypeScript + Tailwind (not a single HTML file)
-- No API key field in the UI
-- Same-origin `POST /api/analyze` with server `OPENAI_API_KEY`
+- Next.js + TypeScript + Tailwind
+- No API key field / Puter in UI
+- Same-origin `POST /api/analyze`
 - Sample + empty / loading / error states
-- Honest disclaimer (tool assist, not a hiring decision)
+- Honest disclaimer
 
-## Local checks
-- `npm run build` succeeded
+## Checks
 - `GET /` → 200
-- `POST /api/analyze` with sample → score 75, 3 gaps, 3 bullets
-
-## Deploy
-Needs a host that supports server env (Vercel free). GitHub Pages cannot run the API route.
+- `POST /api/analyze` sample → score 85, 3 gaps, 3 bullets
+- Hub More demos points at Vercel URL
