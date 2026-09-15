@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f3f1eb;
+  --paper: #fffcf8;
+  --ink: #141413;
+  --muted: #5f5e5a;
+  --line: #e2ddd3;
+  --accent: #1f4fd8;
+  --accent-hover: #183db0;
+  --warn-bg: #fff7e8;
+  --warn-ink: #6a5218;
+  --err: #a11d1d;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+textarea:focus,
+button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, white);
+  outline-offset: 2px;
+}
